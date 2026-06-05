@@ -1,0 +1,26 @@
+# Datos y artefactos del proyecto
+*.parquet
+*.pkl
+*.nc
+*.xlsx
+*.gpkg
+*.html
+historial/
+era5_salta/
+
+# Entornos virtuales y caché
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+
+# Configuraciones de editores
+.vscode/
+.idea/
+*.swp
+
+# Credenciales (por si quedan)
+*_token*
+*_key*
+*_secret*
