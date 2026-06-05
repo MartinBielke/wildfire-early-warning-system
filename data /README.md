@@ -1,4 +1,3 @@
-```markdown
 # Wildfire Early Warning System
 
 Machine learning‑based early warning system for wildfire risk assessment in Salta Province, Argentina.  
