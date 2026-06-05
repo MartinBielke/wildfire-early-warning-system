@@ -1,0 +1,11 @@
+pandas
+numpy
+xarray
+requests
+geopandas
+scikit-learn
+xgboost
+folium
+shapely
+openpyxl
+netCDF4
