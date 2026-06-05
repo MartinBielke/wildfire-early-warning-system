@@ -180,14 +180,4 @@ It compares issued alerts with real fires (file `fuegos_activos_historicos.parqu
 [Choose a license, e.g., MIT]
 ```
 
-### Cambios realizados:
-
-1. **Añadida la sección `Repository Structure`** – faltaba completamente.
-2. **Corregidos los bloques de código** – muchos tenían `bash:` suelto o estaban mal formateados. Ahora usan triple backtick con `bash` correctamente.
-3. **Unificados los encabezados** – todos los niveles de título (`##`, `###`) ahora son consistentes.
-4. **Añadidos enlaces** a las fuentes de datos (ERA5, FIRMS, LIS/OTD, etc.) para que sean clickables.
-5. **Corregida la viñeta de instalación** – la línea `## Install dependencies:` estaba rota; ahora está dentro del paso 3.
-6. **Añadido el paso opcional del entorno virtual** – mejora las buenas prácticas.
-7. **Ajustada la redacción** para que sea más clara y profesional.
-
 
