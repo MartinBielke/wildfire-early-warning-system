@@ -1,3 +1,4 @@
+```markdown
 # Wildfire Early Warning System
 
 Machine learning‑based early warning system for wildfire risk assessment in Salta Province, Argentina.  
@@ -11,20 +12,6 @@ It integrates weather forecasts, environmental indicators, active fire detection
 - Interactive maps (Folium) showing top 20 risk areas.
 - Telegram alerts (message + map).
 - Alert history and automated performance evaluation.
-
-## Repository Structure
-
-```
-.
-├── entrenamiento.py            # Trains XGBoost and saves models & artifacts
-├── alerta_produccion.py        # Daily alert generator (run every day)
-├── backtesting.py              # Evaluates model on historical period (e.g. 2023)
-├── evaluacion.py               # Real‑world alert system performance evaluation
-├── requirements.txt            # Python dependencies
-├── .gitignore                  # Ignored files/folders
-├── README.md                   # This file
-└── era5_salta/                 # Folder where pre‑processed data and outputs are stored
-```
 
 ## Requirements
 
@@ -64,12 +51,12 @@ The system expects several pre‑processed `.parquet` files inside the `era5_sal
 ### 1. Historical meteorological & fire data (ERA5)
 - **Files**: `fired_completo.parquet`, `negativos.parquet`, `fwi_historico.parquet`, `hr_historico.parquet`, `presion_cordillera.parquet`, `datos_chile.parquet`
 - **Source**: [ERA5‑Land](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview) (temperature, wind, precipitation, humidity, pressure) and [FWI](https://cds.climate.copernicus.eu/cdsapp#!/dataset/cems-fire-historical?tab=overview)
-- **Process**: Download daily data for Salta coordinates (2000–2024), compute anomalies, NDVI, days without rain, etc. The preprocessing scripts are not included here, but you can adapt the code in `entrenamiento.py` to generate them from NetCDF files.
+- **Process**: Download daily data for Salta coordinates (2000–2024), compute anomalies, NDVI, days without rain, etc. The preprocessing scripts are not included here, but you can adapt the code inside the notebook to generate them from NetCDF files.
 
 ### 2. Population density per cell
 - **File**: `densidad_poblacional_celdas.parquet`
 - **Original source**: Excel file `Indicadores de personas. Radios, 2022 - Salta.xlsx` (INDEC, Argentina).  
-  You must process this Excel to assign population to each ERA5 grid cell (e.g. spatial interpolation or nearest‑neighbour assignment). The training script expects this file already generated.
+  You must process this Excel to assign population to each ERA5 grid cell (e.g. spatial interpolation or nearest‑neighbour assignment). The notebook expects this file already generated.
 
 ### 3. Lightning (climatological flash rate)
 - **File**: `rayos_celdas.parquet`
@@ -83,19 +70,19 @@ The system expects several pre‑processed `.parquet` files inside the `era5_sal
 
 ### 5. Cell altitude
 - **File**: `altitud_celdas.parquet`
-- **Source**: Open‑Meteo elevation API (automatically obtained during `entrenamiento.py`).
+- **Source**: Open‑Meteo elevation API (automatically obtained during the training section of the notebook).
 
 ### 6. Salta province boundary
 - **File**: `salta_provincia.gpkg`
-- **Source**: OpenStreetMap via OSMnx (automatically downloaded by `cargar_limite_salta()`).
+- **Source**: OpenStreetMap via OSMnx (automatically downloaded by `cargar_limite_salta()` function inside the notebook).
 
 ### 7. Climatologies (auto‑generated)
 - `climatologia_t2m.parquet`, `climatologia_ndvi.parquet`
-- Calculated from the training set (years ≤ 2016) during `entrenamiento.py`.
+- Calculated from the training set (years ≤ 2016) during the training cells.
 
 ## API Keys / Tokens Configuration
 
-Before running production scripts, edit `alerta_produccion.py` and `evaluacion.py` and replace the placeholders with your real credentials:
+Before running the alert parts of the notebook, open `Wildfire_decision_support_system.ipynb` and replace the placeholders in the configuration cell with your real credentials:
 
 ```python
 TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"           # From BotFather on Telegram
@@ -107,64 +94,51 @@ FIRMS_MAP_KEY = "YOUR_FIRMS_API_KEY"        # From NASA FIRMS (firms.modaps.eosd
 
 ## Execution Steps
 
-### 1. Train the model (once)
+All code is contained in a single Jupyter notebook: `Wildfire_decision_support_system.ipynb`.  
+Open it with Jupyter Lab, Jupyter Notebook, or VS Code and execute the cells **in order**.
 
-```bash
-python entrenamiento.py
-```
+The notebook is divided into well‑marked sections:
 
-This will generate inside `era5_salta/`:
-- `modelo_xgb_mejorado.pkl`
-- `top_celdas.parquet`
-- `umbrales_celda.parquet`
-- `altitud_celdas.parquet`
-- `climatologia_t2m.parquet`
-- `climatologia_ndvi.parquet`
+1. **Configuration** – set paths, tokens, thresholds.
+2. **Data loading & preprocessing** – expects pre‑processed `.parquet` files in `era5_salta/`.
+3. **Training** – runs XGBoost and saves model artifacts.
+4. **Backtesting** – evaluates model on a chosen historical year (e.g. 2023).
+5. **Daily alert system** – generates next‑day risk alerts (run this section daily).
+6. **Evaluation** – compares issued alerts with real fires.
 
-### 2. Backtesting (historical evaluation)
+### Step‑by‑step
 
-To evaluate the model on a specific year (e.g. 2023):
+1. **Launch the notebook**:
+   ```bash
+   jupyter notebook Wildfire_decision_support_system.ipynb
+   ```
+   or
+   ```bash
+   jupyter lab Wildfire_decision_support_system.ipynb
+   ```
 
-```bash
-python backtesting.py
-```
-(You can change `YEAR_TEST` inside the script.)
+2. **Run cells sequentially** – execute from top to bottom.
 
-### 3. Daily alert system
+   - **Training cells** (one‑time execution) → generates models and artifacts inside `era5_salta/`.
+   - **Backtesting cells** (optional) → evaluate historical performance (change `YEAR_TEST` in the corresponding cell).
+   - **Alert cells** – run daily to get next‑day risk maps and Telegram notifications.  
+     *Important*: Each time you run these cells, they will download forecasts, query FIRMS, and send Telegram messages.
+   - **Evaluation cells** – run after several days of alerts to measure real‑world performance.
 
-Run automatically every day (e.g. using cron or Task Scheduler):
-
-```bash
-python alerta_produccion.py
-```
-
-This will:
-- Download the forecast for the next day.
-- Query active fire detections from FIRMS.
-- Compute risk for the 50 monitored cells.
-- Generate an HTML map and send Telegram alert.
-- Save history to `era5_salta/historial/historial_alertas.csv`.
-
-### 4. Evaluate real‑world alert system performance
-
-Once you have accumulated enough alert history (at least several days), run:
-
-```bash
-python evaluacion.py
-```
-
-It compares issued alerts with real fires (file `fuegos_activos_historicos.parquet`) and produces:
-- `aciertos_detalle.csv`
-- `falsas_alarmas_detalle.csv`
-- `evaluacion_rendimiento.csv`
-- `evaluacion_por_departamento.csv`
-- A summary message sent via Telegram.
+3. **Scheduling daily alerts** (recommended for production):  
+   Export the alert section of the notebook to a Python script:
+   ```bash
+   jupyter nbconvert --to script --output alerta_diaria Wildfire_decision_support_system.ipynb
+   ```
+   Then edit `alerta_diaria.py` to keep only the alert‑related code (or use the `--template` option). Schedule the script to run once per day (e.g., at 08:00 local time) using cron (Linux/Mac) or Task Scheduler (Windows).
 
 ## Important Notes
 
-- All scripts assume that pre‑processed data resides in the `era5_salta/` folder (relative to the execution directory).
-- The model is trained on the top 50 cells inside Salta. To change that, modify `TOP_N` in `entrenamiento.py`.
-- The fixed alert threshold is 0.50 (change `UMBRAL` in `alerta_produccion.py`). Backtesting suggests alternative thresholds.
+- All code assumes that pre‑processed data resides in the `era5_salta/` folder (relative to the notebook location).
+- The notebook is designed to be run **linearly**. Some cells may take several minutes (training, backtesting).
+- Before running alert cells, ensure you have set your `TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID`, and `FIRMS_MAP_KEY` in the configuration cell.
+- The alert system uses a fixed threshold of 0.50. Change the `UMBRAL` variable inside the notebook if needed.
+- The model is trained on the top 50 cells inside Salta. To change that, modify `TOP_N` in the training section.
 
 ## Credits & Data Sources
 
@@ -179,5 +153,4 @@ It compares issued alerts with real fires (file `fuegos_activos_historicos.parqu
 
 [Choose a license, e.g., MIT]
 ```
-
 
