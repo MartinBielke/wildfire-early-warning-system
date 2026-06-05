@@ -90,14 +90,13 @@ Performance reports are automatically generated and distributed via Telegram, su
 ## 📁 Project Structure
 
 ```
-├── entrenamiento.ipynb # Trains XGBoost and saves models & artifacts
-├── alerta_produccion.ipynb # Daily alert generator (run every day)
-├── backtesting.ipynb # Evaluates model on historical period (e.g. 2023)
-├── evaluacion.ipynb # Real‑world alert system performance evaluation
+.
+├── Wildfire_decision_support_system.ipynb # Main Jupyter notebook (training, alerts, backtesting, evaluation)
 ├── requirements.txt # Python dependencies
 ├── .gitignore # Ignored files/folders
 ├── README.md # This file
 └── era5_salta/ # Folder where pre‑processed data and outputs are stored
+
 ```
 
 ---
