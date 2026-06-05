@@ -87,17 +87,21 @@ Performance reports are automatically generated and distributed via Telegram, su
 
 ---
 
+
 ## 📁 Project Structure
 
-.
-├── entrenamiento.py            # Trains XGBoost and saves models & artifacts
-├── alerta_produccion.py        # Daily alert generator (run every day)
-├── backtesting.py              # Evaluates model on historical period (e.g. 2023)
-├── evaluacion.py               # Real‑world alert system performance evaluation
-├── requirements.txt            # Python dependencies
-├── .gitignore                  # Ignored files/folders
-├── README.md                   # This file
-└── era5_salta/                 # Folder where pre‑processed data and outputs are stored
+```
+
+├── entrenamiento.py # Trains XGBoost and saves models & artifacts
+├── alerta_produccion.py # Daily alert generator (run every day)
+├── backtesting.py # Evaluates model on historical period (e.g. 2023)
+├── evaluacion.py # Real‑world alert system performance evaluation
+├── requirements.txt # Python dependencies
+├── .gitignore # Ignored files/folders
+├── README.md # This file
+└── era5_salta/ # Folder where pre‑processed data and outputs are stored
+
+---
 
 ---
 
