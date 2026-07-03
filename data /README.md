@@ -1,7 +1,7 @@
 # Wildfire Early Warning System
 
 Machine learning‑based early warning system for wildfire risk assessment in Salta Province, Argentina.  
-It integrates weather forecasts, environmental indicators, active fire detections (NASA FIRMS), and geospatial data to predict daily risk for the top 50 historical fire cells and send automated alerts via Telegram.
+It integrates weather forecasts, environmental indicators, active fire detections (NASA FIRMS), and geospatial data to predict daily risk across the full provincial grid (220 cells, including 165 with historical fire records) and send automated alerts via Telegram.
 
 ## Features
 
@@ -25,22 +25,22 @@ It integrates weather forecasts, environmental indicators, active fire detection
 ## Installation
 
 1. Clone the repository:
-   ```bash
+```bash
    git clone https://github.com/MartinBielke/wildfire-early-warning-system.git
    cd wildfire-early-warning-system
-   ```
+```
 
 2. (Optional) Create and activate a virtual environment:
-   ```bash
+```bash
    python -m venv venv
    source venv/bin/activate   # Linux/Mac
    venv\Scripts\activate      # Windows
-   ```
+```
 
 3. Install dependencies:
-   ```bash
+```bash
    pip install -r requirements.txt
-   ```
+```
 
 ## Required Data – How to Obtain It
 
@@ -108,13 +108,13 @@ The notebook is divided into well‑marked sections:
 ### Step‑by‑step
 
 1. **Launch the notebook**:
-   ```bash
+```bash
    jupyter notebook Wildfire_decision_support_system.ipynb
-   ```
+```
    or
-   ```bash
+```bash
    jupyter lab Wildfire_decision_support_system.ipynb
-   ```
+```
 
 2. **Run cells sequentially** – execute from top to bottom.
 
@@ -126,9 +126,9 @@ The notebook is divided into well‑marked sections:
 
 3. **Scheduling daily alerts** (recommended for production):  
    Export the alert section of the notebook to a Python script:
-   ```bash
+```bash
    jupyter nbconvert --to script --output alerta_diaria Wildfire_decision_support_system.ipynb
-   ```
+```
    Then edit `alerta_diaria.py` to keep only the alert‑related code (or use the `--template` option). Schedule the script to run once per day (e.g., at 08:00 local time) using cron (Linux/Mac) or Task Scheduler (Windows).
 
 ## Important Notes
@@ -136,8 +136,8 @@ The notebook is divided into well‑marked sections:
 - All code assumes that pre‑processed data resides in the `era5_salta/` folder (relative to the notebook location).
 - The notebook is designed to be run **linearly**. Some cells may take several minutes (training, backtesting).
 - Before running alert cells, ensure you have set your `TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID`, and `FIRMS_MAP_KEY` in the configuration cell.
-- The alert system uses a fixed threshold of 0.50. Change the `UMBRAL` variable inside the notebook if needed.
-- The model is trained on the top 50 cells inside Salta. To change that, modify `TOP_N` in the training section.
+- The alert system uses a fixed threshold of 0.35, prioritizing recall over precision. Change the `UMBRAL` variable inside the notebook if needed — see the threshold sweep in the Production section for trade-offs at other values.
+- The model is trained on all 165 cells within Salta that have historical fire records (`TOP_N = None`). To restrict training to a subset, set `TOP_N` in the training section.
 
 ## Credits & Data Sources
 
@@ -151,5 +151,3 @@ The notebook is divided into well‑marked sections:
 ## License
 
 [Choose a license, e.g., MIT]
-```
-
